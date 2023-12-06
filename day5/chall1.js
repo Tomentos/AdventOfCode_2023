@@ -50,32 +50,28 @@ fs.readFile('./day5/input.txt', 'utf8', (err, data) => {
             continue;
         }
 
-        //If the line contains data to be calculated
-        else {
+         //Split the values and enter them into more managable variables
+         line = line.split(' ');
+         var start = +line[1];
+         var goal = +line[0];
+         var range = +line[2];
 
-            //Split the values and enter them into more managable variables
-            line = line.split(' ');
-            var start = +line[1];
-            var goal = +line[0];
-            var range = +line[2];
+         //Loop through the numbers as many times as the range allows
+         for (let i = 0; i < range; i++) {
 
-            //Loop through the numbers as many times as the range allows
-            for (let i = 0; i < range; i++) {
+             //Get all final numbers of the previous data set
+             var prev = result[navigation[indexScroll - 1]];
 
-                //Get all final numbers of the previous data set
-                var prev = result[navigation[indexScroll - 1]]
+             //Check if the currently looped number is contained in the previous data set
+             var index = prev.indexOf(+start + i);
 
-                //Check if the currently looped number is contained in the previous data set
-                var index = prev.indexOf(+start + i);
+             //If the number was found
+             if (index != -1) {
 
-                //If the number was found
-                if (index != -1) {
-
-                    //Save the destination number in the same position of the current data set
-                    result[navigation[indexScroll]][index] = goal + i;
-                }
-            }
-        }
+                 //Save the destination number in the same position of the current data set
+                 result[navigation[indexScroll]][index] = goal + i;
+             }
+         }
 
         //Loop through all numbers saved in the current data set
         for (let i = 0; i < result[navigation[indexScroll - 1]].length; i++) {
