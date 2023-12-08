@@ -15,13 +15,6 @@ fs.readFile('./day7/input.txt', 'utf8', (err, data) => {
 
     var final = 0;
     var result = [];
-    var points = [];
-    points['T'] = 9;
-    points['J'] = 10;
-    points['Q'] = 11;
-    points['K'] = 12;
-    points['A'] = 13;
-    
 
     console.log(`\nEvaluating hands in input`);
     for (line of data) {
