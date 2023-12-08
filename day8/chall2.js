@@ -2,7 +2,7 @@
 const fs = require('fs');
 
 //Read input data
-fs.readFile('./day8/test3.txt', 'utf8', (err, data) => {
+fs.readFile('./day8/input.txt', 'utf8', (err, data) => {
 
     //Error event for readFile function
     if (err) {
@@ -36,7 +36,6 @@ fs.readFile('./day8/test3.txt', 'utf8', (err, data) => {
     var map = [];
     var result = 0;
     var current = [];
-    var goal = [];
     var finish = false;
     var re = RegExp(/[0-9a-z][0-9a-z][0-9a-z]/gi);
 
@@ -52,51 +51,40 @@ fs.readFile('./day8/test3.txt', 'utf8', (err, data) => {
 
         if (point[0].endsWith('A')) {
             current.push(point[0]);
-
-            let end = point[0].split('');
-            end[2] = 'Z';
-            goal.push(end.join(''))
         }
     }
 
-    console.log(current, goal);
+    console.log(`Starting navigation`);
 
-    //Loop as long as current point is not ZZZ
-    console.log(`Starting navigation`)
-    for (let i = 0; finish !== true; i++) {
+    //Loop through all starting positions
+    for (curr of current) {
 
-        //Reset the iterator if it reached the max vakze if the instructions
-        if (i === instructions.length) {
-            console.log(`Final instruction reached, resetting loop`);
-            i = 0;
+        result = 0;
+        finish = false
+
+        //Loop as long as final point has not been found
+        for (let i = 0; finish === false; i++) {
+
+            //Reset the iterator if it reached the max vakze if the instructions
+            if (i === instructions.length) {
+                //console.log(`Final instruction reached, resetting loop`);
+                i = 0;
+            }
+
+            curr = map[curr][instructions[i]];
+
+            //Increase steps taken by 1
+            result++;
+
+            //Print new location
+            //console.log(`Moving to ${curr}`);
+
+            if (curr.endsWith('Z')) { finish = true; }
+
         }
-
-        let len = current.length;
-
-        //Save the new location of every position in the current variable
-        for (let j = 0; j < len; j++) {
-            current[j] = map[current[j]][instructions[i]];
-        }
-
-        //Increase steps taken by 1
-        result++;
-
-        //Print new location
-        console.log(`Moving to ${current}`);
-
-        //If all positions are equal, set finish to true
-        if (
-            current[0] == goal[0] &&
-            current[1] == goal[1] &&
-            current[2] == goal[2] &&
-            current[3] == goal[3] &&
-            current[4] == goal[4] &&
-            current[5] == goal[5]
-        ) {
-            finish = true;
-        }
+        console.log(result)
     }
 
     //Print result
-    console.log(`\nAll Z locations reached, steps taken: ${result}`);
+    //console.log(`\nAll Z locations reached, steps taken: ${result}`);
 });
