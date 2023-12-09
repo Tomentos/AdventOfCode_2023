@@ -11,7 +11,7 @@ fs.readFile('./day8/input.txt', 'utf8', (err, data) => {
     }
 
     //Seperate the input into lines
-    data = data.split('\r\n');
+    data = data.split('\n');
     
     //Prepare directions variable
     var instructions = [];
@@ -35,8 +35,8 @@ fs.readFile('./day8/input.txt', 'utf8', (err, data) => {
     //Declare varialbes for later use
     var map = [];
     var result = 0;
+    var lcm = [];
     var current = [];
-    var finish = false;
     var re = RegExp(/[0-9a-z][0-9a-z][0-9a-z]/gi);
 
     //Loop through every navigation point
@@ -63,11 +63,10 @@ fs.readFile('./day8/input.txt', 'utf8', (err, data) => {
         finish = false
 
         //Loop as long as final point has not been found
-        for (let i = 0; finish === false; i++) {
+        for (let i = 0; finish == false; i++) {
 
             //Reset the iterator if it reached the max vakze if the instructions
             if (i === instructions.length) {
-                //console.log(`Final instruction reached, resetting loop`);
                 i = 0;
             }
 
@@ -76,15 +75,37 @@ fs.readFile('./day8/input.txt', 'utf8', (err, data) => {
             //Increase steps taken by 1
             result++;
 
-            //Print new location
-            //console.log(`Moving to ${curr}`);
-
             if (curr.endsWith('Z')) { finish = true; }
 
         }
-        console.log(result)
+
+        //Push this positions distance to the lcm variable to calculate the total steps later
+        lcm.push(result);
+
+        console.log(`Found position ${result}`);
     }
 
+    //Get lcm of all positions
+    result = LCM(lcm);
+
     //Print result
-    //console.log(`\nAll Z locations reached, steps taken: ${result}`);
+    console.log(`\nAll Z locations reached, steps taken: ${result}`);
 });
+
+
+//Function I copy pasted from geeksforgeeks.org to calculate the lcm of all positions
+function LCM(arr) {
+
+    function gcd(a, b) {
+        if (b === 0) return a;
+        return gcd(b, a % b);
+    }
+
+    let res = arr[0];
+
+    for (let i = 1; i < arr.length; i++) {
+        res = (res * arr[i]) / gcd(res, arr[i]);
+    }
+
+    return res;
+}
