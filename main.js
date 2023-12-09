@@ -32,7 +32,8 @@ prompt.get(schema, function (err, input) {
     var path = `./day${input.day}/chall${input.challenge}.js`;
 
     //Execute script as child process
-    var result = cp.fork(path);
+    const result = cp.fork(path);
 
     //Do not print the result variable as it only contains debugging data
+    //console.log(result);
 });

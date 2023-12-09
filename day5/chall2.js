@@ -1,6 +1,9 @@
 //Import required libraries
 const fs = require('fs');
 
+//Start the timer
+console.time('Execution Time');
+
 //Read input data
 fs.readFile('./day5/input.txt', 'utf8', (err, data) => {
 
@@ -14,112 +17,97 @@ fs.readFile('./day5/input.txt', 'utf8', (err, data) => {
     data = data.split('\n');
 
     //Create base variables
-    var navigation = ['seeds', 'soil', 'fertilizer', 'water', 'light', 'temperature', 'humidity', 'location'];
-    var result = [];
-    var seedsTemp = [];
+    var seedData = [];
+    var seeds = [];
     var location = 0;
-    
+
     //Save the seeds in a seperate variable
-    seedsTemp = data[0].split(' ');
-    seedsTemp = seedsTemp.splice(1, seedsTemp.length - 1);
-    seedsTemp = seedsTemp.map(function (x){ return parseInt(x); });
+    seeds = data[0].split(' ');
+    seeds = seeds.splice(1, seeds.length - 1);
+    seeds = seeds.map(function (x){ return parseInt(x); });
     data = data.splice(2, data.length - 1);
     
     //Turn the seed amounts into ranges
-    for (let i = 0; i < seedsTemp.length; i = i + 2) {
-        
-        //Initialize the data set
-        result['seeds'] = [];
-        result['soil'] = [];
-        result['fertilizer'] = [];
-        result['water'] = [];
-        result['light'] = [];
-        result['temperature'] = [];
-        result['humidity'] = [];
-        result['location'] = [];
+    for (let i = 0; i < seeds.length; i = i + 2) {
 
-        //Start the counter for scrolling through the table index
-        var indexScroll = 0;
-        
-        //Define start start seed and the seed range
-        var start = seedsTemp[i];
-        var range = seedsTemp[i + 1];
+        console.log(`Seed range: ${i / 2 + 1} of ${seeds.length / 2}`);
 
-        //Loop through the numbers as many times as the range allows
+        //Save the starting seed and it's range
+        var start = seeds[i];
+        var range = seeds[i + 1];
+        
+        //Loop as many times as the range allows
         for (let j = 0; j < range; j++) {
 
-            //Push the seed into the array and shed a tear with each and every new seed placed in there as the solution for part 1 already took 15 minutes to complete and this will have many many many more seeds now because of this shit im boutta cry man i cannot go on like this anymore
-            result['seeds'].push(start + j);
-        }
-        
-        //Loop through every line of the input
-        for (line of data) {
-    
-            //If the line contains a title / is the beginning of a new data set
-            if (line.includes('-to-')) {
-    
-                //Increase the indexScroll and continue to the next loop
-                indexScroll++;
-                continue;
+            if ((j + 1) % 100000 === 0 || (j + 1) === range || j === 0) {
+                console.log(`Position in seed range: ${j + 1} of ${range}`);
             }
-    
-            //If the line is empty
-            else if (line === '') {
-    
-                //Continue to the next loop
-                continue;
-            }
-    
-            //Split the values and enter them into more managable variables
-            line = line.split(' ');
-            var start = +line[1];
-            var goal = +line[0];
-            var range = +line[2];
-        
-                //Loop through the numbers as many times as the range allows
-                for (let j = 0; j < range; j++) {
-    
-                    //Get all final numbers of the previous data set
-                    var prev = result[navigation[indexScroll - 1]];
-    
-                    //Check if the currently looped number is contained in the previous data set
-                    var index = prev.indexOf(+start + j);
-    
-                    //If the number was found
-                    if (index != -1) {
-                    
-                        //Save the destination number in the same position of the current data set
-                        result[navigation[indexScroll]][index] = goal + j;
-                    }
-               
-                    //Loop through all numbers saved in the current data set
-                    for (let j = 0; j < result[navigation[indexScroll - 1]].length; j++) {
-    
-                        //If one number was not defined in the loop
-                        if (result[navigation[indexScroll]][j] === undefined) {
-    
-                            //Copy the number from the same position of the previous data set
-                            result[navigation[indexScroll]][j] = result[navigation[indexScroll - 1]][j];
-                        }
-                    }
-                }
-        }
+            
+            //Prepare variables needed to find seeds details
+            var nav = 0;
+            var done = false;
+            seedData = [];
+            seedData.push(start + j);
 
-        //Find the lowest location number
-        if (location === 0) {
-            location = Math.min(...result['location']);
-        }
-        else {
-            lowLoc = Math.min(...result['location']);
-            if (location > lowLoc) {
-                location = lowLoc;
+            //Loop through the lines of the data set
+            for (set of data) {
+
+                //console.log(`Log: ${nav + 1}`);
+
+                //If the next category was found
+                if (set.includes('-to-')) {
+
+                    //Copy previous seed details if last one remained unfound
+                    if (seedData[nav] === undefined) { seedData[nav] = seedData[nav - 1]; }
+
+                    //Increase the navigation counter
+                    nav++;
+
+                    //Mark category as not done
+                    done = false;
+
+                    //Continue in next loop
+                    continue;
+                }
+
+                //If category is already done or line is empty, continue to next loop
+                else if (done === true || set === '') { continue; }
+
+                //Split this lines data and save it in variables
+                set = set.split(' ');
+                let exit = +set[1];
+                let dest = +set[0];
+                let max = +set[2];
+
+                //If current range includes the previous categories number
+                if (seedData[nav - 1] >= exit && seedData[nav - 1] <= exit + max) {
+                    
+                    // console.log([
+                    //     `exit: ${exit}`,
+                    //     `dest: ${dest}`,
+                    //     `max: ${max}`,
+                    //     `prev: ${seedData[nav - 1]}`
+                    // ]);
+
+                    //Calculate the new number and save it in current category
+                    seedData[nav] = dest + (seedData[nav - 1] - exit);
+
+                    //Mark category as done
+                    done = true;
+                }
+            }
+
+            //Save location if it is the smallest number yet recorded
+            if (location === 0 || location > seedData[seedData.length - 1] ) {
+                location = seedData[seedData.length - 1];
+                console.log(`New lowest location is ${location}`);
             }
         }
-    
-        //Print the table
-        console.table(result);
     }
 
+    //Print this shit ass number
+    console.log(`\nThe location which can go fuck itself is: ${location}`);
 
-    console.log(`The location which can go fuck itself is: ${location}`)
+    //Stop the timer
+    console.timeEnd('Execution Time');
 });
